@@ -108,6 +108,9 @@
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
+;; magit
+(global-set-key (kbd "C-x g") 'magit-status)
+
 ;; clean up trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (setq require-final-newline t)
