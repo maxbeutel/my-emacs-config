@@ -2,6 +2,7 @@
 # name: function
 # key: prif
 # --
-private function ${1:name}(${2:arg}) {
+private function ${1:name}(${2:arg})
+{
     $0
 }

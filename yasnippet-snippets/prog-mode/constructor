@@ -2,6 +2,7 @@
 # name: function
 # key: ctor
 # --
-public function __construct(${1:arg}) {
+public function __construct(${1:arg})
+{
     $0
 }
