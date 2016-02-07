@@ -369,4 +369,6 @@
 
 (global-set-key (kbd "C-c j") 'my-helm-multi-all)
 
+(global-set-key (kbd "C-c a") 'align-regexp)
+
 ;; -------
