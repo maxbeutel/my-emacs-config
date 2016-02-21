@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: pmck
+# key: pmck
+# condition: (not (eq major-mode 'sh-mode))
+# --
+$this->getMockBuilder(${1:name})->disableOriginalConstructor()->getMock()
