@@ -156,6 +156,11 @@
 ;; auto-complete
 (ac-config-default)
 
+;; calendar config
+
+; make mondays first day of week
+(setq calendar-week-start-day 1)
+
 ;; projectile
 (projectile-global-mode)
 
