@@ -12,7 +12,7 @@
 ;; install required packages
 
 ; list the packages you want
-(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet))
+(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode))
 
 ;; package manager and include path
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -111,6 +111,11 @@
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
 
+;; flycheck
+(global-flycheck-mode)
+
+(setq-default flycheck-disabled-checkers '(php-phpmd php-phpcs emacs-lisp-checkdoc))
+
 ;; clean up trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 (setq require-final-newline t)
@@ -122,6 +127,13 @@
 ;; crontab mode
 (add-to-list 'auto-mode-alist '("crontab\\'" . crontab-mode))
 (add-to-list 'auto-mode-alist '("/crontab_" . crontab-mode))
+
+;; cmake mode
+(setq auto-mode-alist
+	  (append
+	   '(("CMakeLists\\.txt\\'" . cmake-mode))
+	   '(("\\.cmake\\'" . cmake-mode))
+	   auto-mode-alist))
 
 ;; yansippet
 (setq yas-snippet-dirs '("~/Documents/playground/emacs/my-emacs-config/yasnippet-snippets"))
