@@ -5,7 +5,7 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 ;; include paths
-(setenv "PATH" (concat "/usr/local/bin:/opt:" (getenv "PATH")))
+(setenv "PATH" (concat "/Users/max/.cargo/bin:/usr/local/bin:/opt:" (getenv "PATH")))
 (setq exec-path (append exec-path '("/usr/local/bin")))
 (setq exec-path (append exec-path '("/opt")))
 
