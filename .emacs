@@ -12,7 +12,7 @@
 ;; install required packages
 
 ; list the packages you want
-(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection))
+(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles))
 
 ;; package manager and include path
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -115,6 +115,16 @@
 (global-flycheck-mode)
 
 (setq-default flycheck-disabled-checkers '(php-phpmd php-phpcs emacs-lisp-checkdoc))
+(setq-default flycheck-php-executable "/usr/local/bin/php")
+
+;; avy
+(global-set-key (kbd "C-;") 'avy-goto-char)
+(global-set-key (kbd "C-:") 'avy-goto-line)
+
+;; icicle
+(icy-mode 1)
+
+(setq-default icicle-default-thing-insertion "more-of-the-same")
 
 ;; clean up trailing whitespace
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
@@ -368,6 +378,12 @@
          (mapcar (lambda (b)
                    (when (buffer-file-name b) (buffer-name b)))
                  (buffer-list)))))
+
+(defun copy-full-path-to-kill-ring ()
+  "copy buffer's full path to kill ring"
+  (interactive)
+  (when buffer-file-name
+    (kill-new (file-truename buffer-file-name))))
 
 (global-set-key (kbd "C-c m") 'move-buffer-file)
 
