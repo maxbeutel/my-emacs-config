@@ -12,7 +12,7 @@
 ;; install required packages
 
 ; list the packages you want
-(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles))
+(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+))
 
 ;; package manager and include path
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -120,6 +120,13 @@
 ;; avy
 (global-set-key (kbd "C-;") 'avy-goto-char)
 (global-set-key (kbd "C-:") 'avy-goto-line)
+
+;; bookmark+
+(setq bmkp-light-style-autonamed 'line)
+(setq bmkp-light-style-non-autonamed 'line)
+
+(setq bmkp-auto-light-when-set 'any-bookmark)
+(setq bmkp-auto-light-when-jump 'any-bookmark)
 
 ;; icicle
 (icy-mode 1)
