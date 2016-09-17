@@ -12,7 +12,7 @@
 ;; install required packages
 
 ; list the packages you want
-(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+))
+(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+ neotree))
 
 ;; package manager and include path
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
