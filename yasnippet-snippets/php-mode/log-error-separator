@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: function
+# key: lers
+# --
+error_log('---------------');

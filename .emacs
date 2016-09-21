@@ -12,7 +12,7 @@
 ;; install required packages
 
 ; list the packages you want
-(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+ neotree))
+(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+ neotree go-mode))
 
 ;; package manager and include path
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -202,17 +202,6 @@
 ;; disable ido faces to see flx highlights.
 (setq ido-enable-flex-matching t)
 (setq ido-use-faces nil)
-
-;; eshell
-(setenv "PAGER" "cat")
-
-(defalias 'e 'find-file)
-(defalias 'ff 'find-file)
-(defalias 'emacs 'find-file)
-
-(setq eshell-prefer-lisp-functions nil)
-
-(global-set-key (kbd "C-c s") 'eshell)
 
 ;; web-mode settings (also for mixed php/html files)
 (defun my-web-mode-hook ()
@@ -407,10 +396,12 @@
 
 (global-set-key (kbd "C-c k") 'copy-line)
 
-(global-set-key (kbd "C-c j") 'my-helm-multi-all)
-
 (global-set-key (kbd "C-c a") 'align-regexp)
 
 (global-set-key (kbd "C-c w") 'forward-whitespace)
+
+(global-set-key (kbd "C-c n") 'neotree-dir)
+
+(global-set-key (kbd "C-c j") 'ansi-term)
 
 ;; -------
