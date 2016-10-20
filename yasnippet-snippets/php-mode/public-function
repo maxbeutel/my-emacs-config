@@ -2,7 +2,7 @@
 # name: function
 # key: pubf
 # --
-public function ${1:name}(${2:arg})
+public function $1($2)
 {
     $0
 }

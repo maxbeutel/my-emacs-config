@@ -1,5 +1,5 @@
 # -*- mode: snippet; require-final-newline: nil -*-
 # name: function
-# key: ler
+# key: lerr
 # --
 error_log($0);

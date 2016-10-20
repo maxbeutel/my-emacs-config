@@ -2,7 +2,7 @@
 # name: function
 # key: prof
 # --
-protected function ${1:name}(${2:arg})
+protected function $1($2)
 {
     $0
 }

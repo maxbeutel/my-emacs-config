@@ -12,7 +12,7 @@
 ;; install required packages
 
 ; list the packages you want
-(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+ neotree go-mode))
+(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+ neotree go-mode paredit ess))
 
 ;; package manager and include path
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -105,8 +105,20 @@
 (setq-default indent-tabs-mode nil)
 (setq line-number-display-limit-width 2000000)
 
-
+;; load path
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
+
+;; paredit
+(add-hook 'php-mode-hook #'enable-paredit-mode)
+(add-hook 'c-mode-hook #'enable-paredit-mode)
+
+; override function to avoid space before paren being inserted
+(defun paredit-space-for-delimiter-p (endp delimiter)
+  (and (not (if endp (eobp) (bobp)))
+       (memq (char-syntax (if endp (char-after) (char-before)))
+             (list ?\"  ;; REMOVED ?w ?_
+                   (let ((matching (matching-paren delimiter)))
+                     (and matching (char-syntax matching)))))))
 
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -169,10 +181,6 @@
 (global-set-key (kbd "C-c o") 'helm-occur)
 (global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
 (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
-
-(add-hook 'eshell-mode-hook
-          #'(lambda ()
-              (define-key eshell-mode-map (kbd "C-c C-l")  'helm-eshell-history)))
 
 ;; dired+
 (diredp-toggle-find-file-reuse-dir 1)
@@ -402,6 +410,6 @@
 
 (global-set-key (kbd "C-c n") 'neotree-dir)
 
-(global-set-key (kbd "C-c j") 'ansi-term)
+(global-set-key (kbd "C-c s") 'ansi-term)
 
 ;; -------
