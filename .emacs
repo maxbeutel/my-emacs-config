@@ -112,13 +112,15 @@
 (add-hook 'php-mode-hook #'enable-paredit-mode)
 (add-hook 'c-mode-hook #'enable-paredit-mode)
 
-; override function to avoid space before paren being inserted
-(defun paredit-space-for-delimiter-p (endp delimiter)
-  (and (not (if endp (eobp) (bobp)))
-       (memq (char-syntax (if endp (char-after) (char-before)))
-             (list ?\"  ;; REMOVED ?w ?_
-                   (let ((matching (matching-paren delimiter)))
-                     (and matching (char-syntax matching)))))))
+; prevent paredit from inserting space before [ { ( in php-mode
+(defun my-at-expression-paredit-space-for-delimiter-predicate (endp delimiter)
+  (if (and (eq major-mode 'php-mode)
+           (not endp))
+      (not (or (and (memq delimiter '(?\[ ?\{ ?\()))))
+    t))
+
+(add-hook 'paredit-space-for-delimiter-predicates
+          #'my-at-expression-paredit-space-for-delimiter-predicate)
 
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -128,6 +130,10 @@
 
 (setq-default flycheck-disabled-checkers '(php-phpmd php-phpcs emacs-lisp-checkdoc))
 (setq-default flycheck-php-executable "/usr/local/bin/php")
+(setq-default flycheck-rust-executable "/Users/max/.cargo/bin/rustc")
+(setq-default flycheck-rust-cargo-executable "/Users/max/.cargo/bin/cargo")
+
+(add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 
 ;; avy
 (global-set-key (kbd "C-;") 'avy-goto-char)
