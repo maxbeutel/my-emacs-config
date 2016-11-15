@@ -86,16 +86,17 @@
 (setq column-number-mode t)
 
 ;; c-mode
-(setq c-basic-indent 4)
-(setq c-default-style "linux"
-      c-basic-offset 4
-      c-indent-level 4)
+;; (setq c-basic-indent 4)
+;; (setq c-default-style "linux"
+;;       c-basic-offset 4
+;;       c-indent-level 4)
 
-(add-hook 'c-mode-common-hook
-          (lambda ()
-             (c-set-offset 'case-label '+)
-             (c-set-offset 'inclass '4)
-             (c-set-offset 'comment-intro 0)))
+;; (add-hook 'c-mode-common-hook
+;;           (lambda ()
+;;              (c-set-offset 'case-label '+)
+;;              (c-set-offset 'inclass '4)
+;;              (c-set-offset 'comment-intro 0)))
+(add-hook 'c-mode-common-hook 'google-set-c-style)
 
 ;; nxml-mode
 (setq nxml-child-indent 4
@@ -112,10 +113,11 @@
 (add-hook 'php-mode-hook #'enable-paredit-mode)
 (add-hook 'c-mode-hook #'enable-paredit-mode)
 (add-hook 'rust-mode-hook #'enable-paredit-mode)
+(add-hook 'c++-mode-hook #'enable-paredit-mode)
 
-; prevent paredit from inserting space before [ { ( in php-mode
+; prevent paredit from inserting space before [ { ( in some mode
 (defun my-at-expression-paredit-space-for-delimiter-predicate (endp delimiter)
-  (if (and (member major-mode '(php-mode rust-mode c-mode))
+  (if (and (member major-mode '(php-mode rust-mode c-mode c++-mode))
            (not endp))
       (not (or (and (memq delimiter '(?\[ ?\{ ?\()))))
     t))
@@ -136,8 +138,17 @@
 
 (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
 
-;; rustfmt
+;; rust
 (setq-default rustfmt-bin "/Users/max/.cargo/bin/rustfmt")
+(setq racer-rust-src-path "/Users/max/Documents/playground/rust/rustc-1.13.0/src")
+
+(add-hook 'rust-mode-hook #'racer-mode)
+(add-hook 'racer-mode-hook #'eldoc-mode)
+
+(add-hook 'racer-mode-hook #'company-mode)
+
+(define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+(setq company-tooltip-align-annotations t)
 
 ;; avy
 (global-set-key (kbd "C-;") 'avy-goto-char)
@@ -188,9 +199,11 @@
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "C-x C-f") 'helm-find-files)
 (global-set-key (kbd "C-x b") 'helm-mini)
-(global-set-key (kbd "C-c o") 'helm-occur)
 (global-set-key (kbd "C-h SPC") 'helm-all-mark-rings)
 (define-key minibuffer-local-map (kbd "C-c C-l") 'helm-minibuffer-history)
+
+;; swiper
+(global-set-key (kbd "C-c o") 'swiper)
 
 ;; dired+
 (diredp-toggle-find-file-reuse-dir 1)
@@ -461,5 +474,7 @@
 (global-set-key (kbd "C-c n") 'neotree-dir)
 
 (global-set-key (kbd "C-c s") 'ansi-term)
+
+(global-set-key (kbd "C-c j") 'recompile)
 
 ;; -------
