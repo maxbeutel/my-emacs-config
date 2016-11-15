@@ -1,5 +1,5 @@
 # -*- mode: snippet; require-final-newline: nil -*-
-# name: function
+# name: ctor
 # key: ctor
 # --
 public function __construct(${1:arg})

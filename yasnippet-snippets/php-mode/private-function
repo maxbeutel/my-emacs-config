@@ -1,5 +1,5 @@
 # -*- mode: snippet; require-final-newline: nil -*-
-# name: function
+# name: prif
 # key: prif
 # --
 private function $1($2)
