@@ -12,7 +12,7 @@
 ;; install required packages
 
 ; list the packages you want
-(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+ neotree go-mode paredit ess))
+(setq package-list '(auto-complete popup color-theme flx-ido flx async helm-git-grep helm helm-core helm-projectile dash projectile pkg-info epl php-mode web-mode zenburn-theme dired+ helm-ag crontab-mode magit expand-region helm-swoop org diff-hl scss-mode yasnippet flycheck cmake-mode string-inflection avy icicles bookmark+ neotree go-mode smartparens ess))
 
 ;; package manager and include path
 (setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -78,6 +78,9 @@
 (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type)
 (global-diff-hl-mode 1)
 
+;; re-builder
+(setq reb-re-syntax 'string)
+
 ;; Keep up with compile output
 (setq compilation-scroll-output t)
 
@@ -91,12 +94,13 @@
 ;;       c-basic-offset 4
 ;;       c-indent-level 4)
 
-;; (add-hook 'c-mode-common-hook
-;;           (lambda ()
-;;              (c-set-offset 'case-label '+)
-;;              (c-set-offset 'inclass '4)
-;;              (c-set-offset 'comment-intro 0)))
-(add-hook 'c-mode-common-hook 'google-set-c-style)
+(add-hook 'c-mode-common-hook
+          (lambda ()
+             (c-set-offset 'case-label '+)
+             (c-set-offset 'inclass '4)
+             (c-set-offset 'comment-intro 0)))
+(add-hook 'c-mode-hook 'google-set-c-style)
+(add-hook 'c++-mode-hook 'google-set-c-style)
 
 ;; nxml-mode
 (setq nxml-child-indent 4
@@ -109,21 +113,31 @@
 ;; load path
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 
-;; paredit
-(add-hook 'php-mode-hook #'enable-paredit-mode)
-(add-hook 'c-mode-hook #'enable-paredit-mode)
-(add-hook 'rust-mode-hook #'enable-paredit-mode)
-(add-hook 'c++-mode-hook #'enable-paredit-mode)
+;; smartparens
+;; for more see https://github.com/Fuco1/.emacs.d/blob/master/files/smartparens.el
+(smartparens-global-mode 1)
 
-; prevent paredit from inserting space before [ { ( in some mode
-(defun my-at-expression-paredit-space-for-delimiter-predicate (endp delimiter)
-  (if (and (member major-mode '(php-mode rust-mode c-mode c++-mode))
-           (not endp))
-      (not (or (and (memq delimiter '(?\[ ?\{ ?\()))))
-    t))
+(add-hook 'php-mode-hook #'turn-on-smartparens-strict-mode)
+(add-hook 'c-mode-hook #'turn-on-smartparens-strict-mode)
+(add-hook 'rust-mode-hook #'turn-on-smartparens-strict-mode)
+(add-hook 'c++-mode-hook #'turn-on-smartparens-strict-mode)
 
-(add-hook 'paredit-space-for-delimiter-predicates
-          #'my-at-expression-paredit-space-for-delimiter-predicate)
+(define-key smartparens-mode-map (kbd "C-M-f") 'sp-forward-sexp)
+(define-key smartparens-mode-map (kbd "C-M-b") 'sp-backward-sexp)
+
+(define-key smartparens-mode-map (kbd "C-M-d") 'sp-down-sexp)
+(define-key smartparens-mode-map (kbd "C-M-a") 'sp-backward-down-sexp)
+(define-key smartparens-mode-map (kbd "C-S-d") 'sp-beginning-of-sexp)
+(define-key smartparens-mode-map (kbd "C-S-a") 'sp-end-of-sexp)
+
+(define-key smartparens-mode-map (kbd "C-M-k") 'sp-kill-sexp)
+(define-key smartparens-mode-map (kbd "C-M-w") 'sp-copy-sexp)
+
+(define-key smartparens-mode-map (kbd "M-D") 'sp-splice-sexp)
+
+; rebind defun start/end to avoid conflict with smartparens keybindings
+(global-set-key (kbd "C-M-<") 'beginning-of-defun)
+(global-set-key (kbd "C-M->") 'end-of-defun)
 
 ;; magit
 (global-set-key (kbd "C-x g") 'magit-status)
@@ -147,7 +161,6 @@
 
 (add-hook 'racer-mode-hook #'company-mode)
 
-(define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
 (setq company-tooltip-align-annotations t)
 
 ;; avy
