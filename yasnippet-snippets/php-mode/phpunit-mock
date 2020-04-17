@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: pmck
-# key: pmck
-# --
-$this->getMockBuilder($1)
-    ->disableOriginalConstructor()
-    ->getMock();

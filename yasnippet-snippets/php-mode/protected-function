@@ -1,8 +1,0 @@
-# -*- mode: snippet; require-final-newline: nil -*-
-# name: prof
-# key: prof
-# --
-protected function $1($2)
-{
-    $0
-}

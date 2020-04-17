@@ -1,5 +1,0 @@
-# -*- mode: snippet; require-final-newline: nil -*-
-# name: lerj
-# key: lerj
-# --
-error_log(json_encode($0));
