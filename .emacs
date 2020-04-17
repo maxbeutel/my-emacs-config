@@ -105,7 +105,42 @@
 ; check for file changes
 (global-auto-revert-mode t)
 
+; Highlight matching parenthesis
+(show-paren-mode 1)
+
+; Allows moving through wrapped lines as they appear
+(setq line-move-visual t)
+
 ;; Packages
+
+;; Syntax checking
+(use-package flycheck
+             :ensure t
+             :config
+             (global-flycheck-mode))
+
+;; Autocomplete popups
+(use-package company
+             :ensure t
+             :config
+             (progn
+               (setq company-idle-delay 0.2
+                     ;; min prefix of 2 chars
+                     company-minimum-prefix-length 2
+                     company-selection-wrap-around t
+                     company-show-numbers t
+                     company-echo-delay 0
+                     company-tooltip-limit 20
+                     company-transformers '(company-sort-by-occurrence)
+                     company-begin-commands '(self-insert-command)
+                     )
+               (global-company-mode))
+             )
+
+;; Make buffer names unique
+;; buffernames that are foo<1>, foo<2> are hard to read. This makes them foo|dir  foo|otherdir
+(use-package uniquify
+             :config (setq uniquify-buffer-name-style 'post-forward))
 
 (use-package diff-hl
   :ensure t
@@ -188,7 +223,7 @@
 (use-package projectile
   :ensure t
   :config
-  (projectile-global-mode)
+  (projectile-mode 1)
   (setq projectile-use-git-grep 1))
 
 (use-package go-mode
@@ -268,14 +303,14 @@
   (load-theme 'minimal-black t)
 
   ; Don't change font-size of org-mode headlines
-  ;; (custom-theme-set-faces 'user
-  ;;       		  `(org-level-1 ((t (:bold t :foreground ,"light gray" :height 1.0))))
-  ;;       		  `(org-level-2 ((t (:bold nil :foreground ,"light gray" :height 1.0))))
-  ;;       		  `(org-level-3 ((t (:bold t :foreground ,"light gray" :height 1.0))))
-  ;;       		  `(org-level-4 ((t (:bold nil :foreground ,"light gray" :height 1.0))))
-  ;;       		  `(org-link ((t (:foreground ,"light slate gray" :underline t))))
-  ;;       		  `(org-todo ((t (:bold t :foreground "red"))))
-  ;;       		  `(org-done ((t (:bold t :foreground "green")))))
+  (custom-theme-set-faces 'user
+        		  `(org-level-1 ((t (:bold t :foreground ,"light gray" :height 1.0))))
+        		  `(org-level-2 ((t (:bold nil :foreground ,"light gray" :height 1.0))))
+        		  `(org-level-3 ((t (:bold t :foreground ,"light gray" :height 1.0))))
+        		  `(org-level-4 ((t (:bold nil :foreground ,"light gray" :height 1.0))))
+        		  `(org-link ((t (:foreground ,"light slate gray" :underline t))))
+        		  `(org-todo ((t (:bold t :foreground "red"))))
+        		  `(org-done ((t (:bold t :foreground "green")))))
 
   (set-cursor-color "#FF6F65")
   (custom-set-faces '(cursor ((t (:background "#FF6F65")))))
