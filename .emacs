@@ -13,8 +13,8 @@
 
 ;; include paths
 (setenv "PATH" (concat "/usr/local/bin:/opt:" (getenv "PATH")))
-(setq exec-path (append exec-path '("/opt")))
 (setq exec-path (append exec-path '("/Applications/Racket\ v7.6/bin/racket")))
+(setq exec-path (append exec-path '("/Users/max/go/bin")))
 
 ;; extend load path
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
@@ -204,6 +204,7 @@
   :ensure t
   :after (ivy)
   :init
+  (setq counsel-find-file-ignore-regexp "\\~$\\'")
   (global-set-key (kbd "M-x") 'counsel-M-x)
   (global-set-key (kbd "C-x C-f") 'counsel-find-file)
   (global-set-key (kbd "M-y") 'counsel-yank-pop)
@@ -219,6 +220,12 @@
   ;; (global-set-key (kbd "C-x l") 'counsel-locate)
   ;; (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
   (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
+
+(use-package dockerfile-mode
+  :ensure t)
+
+(use-package yaml-mode
+  :ensure t)
 
 (use-package projectile
   :ensure t
@@ -264,13 +271,19 @@
   (ido-everywhere 1))
 
 (use-package org
-  :ensure t)
+  :ensure t
+  :init
+  (global-set-key (kbd "C-c q") 'org-agenda)
+  (setq org-log-done t
+        org-agenda-files '("/Users/max/Documents/org")))
 
 (use-package string-inflection
   :ensure t)
 
-(use-package org-beautify-theme
-  :ensure t)
+(use-package org-bullets
+  :ensure t
+  :init
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (use-package google-c-style
   :ensure t)
@@ -317,9 +330,9 @@
 
   ; Highlighting of current line background color, don't disable syntax coloring.
   (global-hl-line-mode 1)
-  (set-face-attribute 'hl-line nil :inherit nil  :foreground nil :background "#222222")
-  (set-face-attribute 'highlight nil :inherit nil :background "#666666")
-  (set-face-attribute 'region nil :inherit nil :background "#666666")
+  (set-face-attribute 'hl-line nil :inherit nil  :background "#222")
+  (set-face-attribute 'highlight nil :inherit nil :foreground "#000" :background "lime")
+  (set-face-attribute 'region nil :inherit nil :foreground "#000" :background "lime")
 
   ; Disable italics font face
   (set-face-italic 'font-lock-comment-face nil))
@@ -375,20 +388,44 @@
           (select-window first-win)
           (if this-win-2nd (other-window 1))))))
 
-(defun rename-file-and-buffer (new-name)
-  "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive "sNew name: ")
-  (let ((name (buffer-name))
+;; (defun rename-file-and-buffer (new-name)
+;;   "Renames both current buffer and file it's visiting to NEW-NAME."
+;;   (interactive "sNew name: ")
+;;   (let ((name (buffer-name))
+;;         (filename (buffer-file-name)))
+;;     (if (not filename)
+;;         (message "Buffer '%s' is not visiting a file!" name)
+;;       (if (get-buffer new-name)
+;;           (message "A buffer named '%s' already exists!" new-name)
+;;         (progn
+;;           (rename-file name new-name 1)
+;;           (rename-buffer new-name)
+;;           (set-visited-file-name new-name)
+;;           (set-buffer-modified-p nil))))))
+
+(defun rename-file-and-buffer ()
+  "Renames current buffer and file it is visiting."
+  (interactive)
+  (let* ((name (buffer-name))
         (filename (buffer-file-name)))
-    (if (not filename)
-        (message "Buffer '%s' is not visiting a file!" name)
-      (if (get-buffer new-name)
-          (message "A buffer named '%s' already exists!" new-name)
-        (progn
-          (rename-file name new-name 1)
-          (rename-buffer new-name)
-          (set-visited-file-name new-name)
-          (set-buffer-modified-p nil))))))
+    (if (not (and filename (file-exists-p filename)))
+        (error "Buffer '%s' is not visiting a file!" name)
+      (let* ((dir (file-name-directory filename))
+             (new-name (read-file-name "New name: " dir)))
+        (cond ((get-buffer new-name)
+               (error "A buffer named '%s' already exists!" new-name))
+              (t
+               (let ((dir (file-name-directory new-name)))
+                 (when (and (not (file-exists-p dir)) (yes-or-no-p (format "Create directory '%s'?" dir)))
+                   (make-directory dir t)))
+               (rename-file filename new-name 1)
+               (rename-buffer new-name)
+               (set-visited-file-name new-name)
+               (set-buffer-modified-p nil)
+               (when (fboundp 'recentf-add-file)
+                   (recentf-add-file new-name)
+                   (recentf-remove-if-non-kept filename))
+               (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
 
 (defun uniquify-all-lines-region (start end)
   "Find duplicate lines in region START to END keeping first occurrence."
@@ -435,10 +472,17 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-beautify-theme use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window))))
+    (org-bullets nord-theme yaml-mode dockerfile-mode org-beautify-theme use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(cursor ((t (:background "#FF6F65")))))
+ '(cursor ((t (:background "#FF6F65"))))
+ '(org-done ((t (:bold t :foreground "green"))))
+ '(org-level-1 ((t (:bold t :foreground "light gray" :height 1.0))))
+ '(org-level-2 ((t (:bold nil :foreground "light gray" :height 1.0))))
+ '(org-level-3 ((t (:bold t :foreground "light gray" :height 1.0))))
+ '(org-level-4 ((t (:bold nil :foreground "light gray" :height 1.0))))
+ '(org-link ((t (:foreground "light slate gray" :underline t))))
+ '(org-todo ((t (:bold t :foreground "red")))))
