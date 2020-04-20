@@ -15,6 +15,7 @@
 (setenv "PATH" (concat "/usr/local/bin:/opt:" (getenv "PATH")))
 (setq exec-path (append exec-path '("/Applications/Racket\ v7.6/bin/racket")))
 (setq exec-path (append exec-path '("/Users/max/go/bin")))
+(setq exec-path (append exec-path '("/usr/local/texlive/2017/bin/x86_64-darwin")))
 
 ;; extend load path
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
@@ -84,7 +85,7 @@
       desktop-base-lock-name "lock"
       desktop-path (list desktop-dirname)
       desktop-save t
-      desktop-files-not-to-save "^$" ;reload tramp paths
+      desktop-files-not-to-save "^$" ; reload tramp paths
       desktop-load-locked-desktop nil
       desktop-auto-save-timeout 30)
 
@@ -338,70 +339,63 @@
   (set-face-italic 'font-lock-comment-face nil))
 
 ;; Custom functions
-(defun zap-to-isearch (rbeg rend)
-    (interactive "r")
-    (when (not mark-active)
-      (error "Mark is not active"))
-    (let* ((isearch-bounds (list isearch-other-end (point)))
-           (ismin (apply 'min isearch-bounds))
-           (ismax (apply 'max isearch-bounds))
-           )
-      (if (< (mark) ismin)
-          (kill-region (mark) ismin)
-        (if (> (mark) ismax)
-            (kill-region ismax (mark))
-          (error "Internal error in isearch kill function.")))
-      (isearch-exit)
-      ))
 
-(define-key isearch-mode-map [(meta z)] 'zap-to-isearch)
+(defvar my-image-dir (expand-file-name "/Users/max/Documents/org/images"))
 
-(defun isearch-exit-other-end (rbeg rend)
-    (interactive "r")
-    (isearch-exit)
-    (goto-char isearch-other-end))
-
-(define-key isearch-mode-map [(control return)] 'isearch-exit-other-end)
-
-(defun toggle-window-split ()
+(defun org-insert-my-image ()
+  "Insert image from a directory and add link in current file."
   (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-             (next-win-buffer (window-buffer (next-window)))
-             (this-win-edges (window-edges (selected-window)))
-             (next-win-edges (window-edges (next-window)))
-             (this-win-2nd (not (and (<= (car this-win-edges)
-                                         (car next-win-edges))
-                                     (<= (cadr this-win-edges)
-                                         (cadr next-win-edges)))))
-             (splitter
-              (if (= (car this-win-edges)
-                     (car (window-edges (next-window))))
-                  'split-window-horizontally
-                'split-window-vertically)))
-        (delete-other-windows)
-        (let ((first-win (selected-window)))
-          (funcall splitter)
-          (if this-win-2nd (other-window 1))
-          (set-window-buffer (selected-window) this-win-buffer)
-          (set-window-buffer (next-window) next-win-buffer)
-          (select-window first-win)
-          (if this-win-2nd (other-window 1))))))
+  (let (file-list target-dir file-list-sorted start-file start-file-full file-ext end-file end-file-base end-file-full file-number)
+    ;; clean directories from list but keep times
+    (setq file-list
+          (-remove (lambda (x) (nth 1 x))
+                   (directory-files-and-attributes my-image-dir)))
+    ;; sort list by most recent
+  ;; http://stackoverflow.com/questions/26514437/emacs-sort-list-of-directories-files-by-modification-date
+  (setq file-list-sorted
+        (mapcar #'car
+                (sort file-list
+                      #'(lambda (x y) (time-less-p (nth 6 y) (nth 6 x))))))
 
-;; (defun rename-file-and-buffer (new-name)
-;;   "Renames both current buffer and file it's visiting to NEW-NAME."
-;;   (interactive "sNew name: ")
-;;   (let ((name (buffer-name))
-;;         (filename (buffer-file-name)))
-;;     (if (not filename)
-;;         (message "Buffer '%s' is not visiting a file!" name)
-;;       (if (get-buffer new-name)
-;;           (message "A buffer named '%s' already exists!" new-name)
-;;         (progn
-;;           (rename-file name new-name 1)
-;;           (rename-buffer new-name)
-;;           (set-visited-file-name new-name)
-;;           (set-buffer-modified-p nil))))))
+  ;; use ivy to select start-file
+  (setq start-file (ivy-read
+                    (concat "Select file from " my-image-dir ":")
+                    file-list-sorted
+                    :re-builder #'ivy--regex
+                    :sort nil
+                    :initial-input nil))
+
+  ;; add full path to start file and end-file
+  (setq start-file-full
+        (expand-file-name start-file my-image-dir))
+
+  (message "Inserting file %s" start-file-full)
+
+  (insert (org-make-link-string (format "file:%s" start-file-full)))
+  ;; display image
+  (org-display-inline-images t t)))
+
+
+(defun org-screenshot ()
+  "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
+  (interactive)
+  (org-display-inline-images)
+  (setq filename
+        (concat
+         (make-temp-name
+          (concat (file-name-nondirectory (buffer-file-name))
+                  "_imgs/"
+                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+  (unless (file-exists-p (file-name-directory filename))
+    (make-directory (file-name-directory filename)))
+  ; take screenshot
+  (if (eq system-type 'darwin)
+      (call-process "screencapture" nil nil nil "-i" filename))
+  (if (eq system-type 'gnu/linux)
+      (call-process "import" nil nil nil filename))
+  ; insert into file if correctly taken
+  (if (file-exists-p filename)
+    (insert (concat "[[file:" filename "]]"))))
 
 (defun rename-file-and-buffer ()
   "Renames current buffer and file it is visiting."
@@ -439,7 +433,7 @@
         (replace-match "\\1\n\\2")))))
 
 (defun copy-full-path-to-kill-ring ()
-  "copy buffer's full path to kill ring"
+  "Copy buffer's full path to kill ring."
   (interactive)
   (when buffer-file-name
     (kill-new (file-truename buffer-file-name))))
@@ -465,14 +459,21 @@
 (global-set-key (kbd "C-c x") 'erase-buffer)
 
 (global-set-key (kbd "M-k") 'delete-region)
+
+;; NOTE: customizing the scale factor of the Latex preview for org mode in `org-format-latex-options`.
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-format-latex-options
+   (quote
+    (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+                 ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(package-selected-packages
    (quote
-    (org-bullets nord-theme yaml-mode dockerfile-mode org-beautify-theme use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window))))
+    (org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
