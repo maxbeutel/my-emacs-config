@@ -246,6 +246,9 @@
   :config
   (diredp-toggle-find-file-reuse-dir 1))
 
+(use-package s
+  :load-path "~/.emacs.d/packages/s")
+
 (use-package dired-x
   :init
   (add-hook 'dired-mode-hook 'auto-revert-mode)
@@ -340,16 +343,21 @@
 
 ;; Custom functions
 
+
 (defvar my-image-dir (expand-file-name "/Users/max/Documents/org/images"))
 
-(defun org-insert-my-image ()
-  "Insert image from a directory and add link in current file."
+(defun org-insert-my-image()
+  "Insert image from a directory, add link in current file."
   (interactive)
   (let (file-list target-dir file-list-sorted start-file start-file-full file-ext end-file end-file-base end-file-full file-number)
     ;; clean directories from list but keep times
     (setq file-list
           (-remove (lambda (x) (nth 1 x))
                    (directory-files-and-attributes my-image-dir)))
+
+    ;; get target directory
+    (setq target-dir (file-name-directory (buffer-file-name)))
+
     ;; sort list by most recent
   ;; http://stackoverflow.com/questions/26514437/emacs-sort-list-of-directories-files-by-modification-date
   (setq file-list-sorted
@@ -359,7 +367,7 @@
 
   ;; use ivy to select start-file
   (setq start-file (ivy-read
-                    (concat "Select file from " my-image-dir ":")
+                    (concat "Move selected file to " target-dir ":")
                     file-list-sorted
                     :re-builder #'ivy--regex
                     :sort nil
@@ -368,15 +376,46 @@
   ;; add full path to start file and end-file
   (setq start-file-full
         (expand-file-name start-file my-image-dir))
+  ;; generate target file name from current org section
+  (setq file-ext (file-name-extension start-file t))
 
-  (message "Inserting file %s" start-file-full)
+  ;; my phone app doesn't add an extension to the image so I do it
+  ;; here. If you want to keep the existing extension then use the
+  ;; line above
+  ;;(setq file-ext ".jpg")
+  ;; get section heading and clean it up
+  (setq end-file-base (s-downcase (s-dashed-words (nth 4 (org-heading-components)))))
+  ;; shorten to first 40 chars to avoid long file names
+  (setq end-file-base (s-left 40 end-file-base))
+  ;; number to append to ensure unique name
+  (setq file-number 1)
+  (setq end-file (concat
+                  end-file-base
+                  (format "-%s" file-number)
+                  file-ext))
 
-  (insert (org-make-link-string (format "file:%s" start-file-full)))
+  ;; increment number at end of name if file exists
+  (while (file-exists-p end-file)
+    ;; increment
+    (setq file-number (+ file-number 1))
+    (setq end-file (concat
+                    end-file-base
+                    (format "-%s" file-number)
+                    file-ext))
+    )
+
+  ;; final file name including path
+  (setq end-file-full
+        (expand-file-name end-file target-dir))
+  ;; rename file
+  (rename-file start-file-full end-file-full)
+  (message "moved %s to %s" start-file-full end-file)
+  ;; insert link
+  (insert (org-make-link-string (format "file:%s" end-file)))
   ;; display image
   (org-display-inline-images t t)))
 
-
-(defun org-screenshot ()
+(defun org-my-screenshot ()
   "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
   (interactive)
   (org-display-inline-images)
