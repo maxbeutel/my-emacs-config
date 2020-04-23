@@ -21,7 +21,7 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
 (add-to-list 'load-path "/usr/local/Cellar/maxima/5.41.0/share/maxima/5.41.0/emacs")
 
-;; general ui
+;; General ui
 (add-to-list 'default-frame-alist '(font . "Consolas-20"))
 
 ; enable all commands
@@ -111,6 +111,9 @@
 
 ; Allows moving through wrapped lines as they appear
 (setq line-move-visual t)
+
+; Wrap long lines
+(setq-default truncate-lines nil)
 
 ;; Packages
 
@@ -246,9 +249,6 @@
   :config
   (diredp-toggle-find-file-reuse-dir 1))
 
-(use-package s
-  :load-path "~/.emacs.d/packages/s")
-
 (use-package dired-x
   :init
   (add-hook 'dired-mode-hook 'auto-revert-mode)
@@ -278,6 +278,11 @@
   :ensure t
   :init
   (global-set-key (kbd "C-c q") 'org-agenda)
+  ;; (setq org-hide-emphasis-markers t)
+  ;; (setq org-emphasis-alist
+  ;;       (quote (("*" bold)
+  ;;               ("=" (:foreground "yellow" :background "black"))
+  ;;               )))
   (setq org-log-done t
         org-agenda-files '("/Users/max/Documents/org")))
 
@@ -343,82 +348,56 @@
 
 ;; Custom functions
 
-
-(defvar my-image-dir (expand-file-name "/Users/max/Documents/org/images"))
+(defvar my-image-dir (expand-file-name "/Users/max/Documents/org/sync-images"))
 
 (defun org-insert-my-image()
-  "Insert image from a directory, add link in current file."
+  "Copy image from a directory, insert to same directory as screenshots, add link in current file."
   (interactive)
+
   (let (file-list target-dir file-list-sorted start-file start-file-full file-ext end-file end-file-base end-file-full file-number)
-    ;; clean directories from list but keep times
     (setq file-list
           (-remove (lambda (x) (nth 1 x))
                    (directory-files-and-attributes my-image-dir)))
 
-    ;; get target directory
     (setq target-dir (file-name-directory (buffer-file-name)))
 
-    ;; sort list by most recent
+  ;; Sort list by most recent
   ;; http://stackoverflow.com/questions/26514437/emacs-sort-list-of-directories-files-by-modification-date
   (setq file-list-sorted
         (mapcar #'car
                 (sort file-list
                       #'(lambda (x y) (time-less-p (nth 6 y) (nth 6 x))))))
 
-  ;; use ivy to select start-file
   (setq start-file (ivy-read
-                    (concat "Move selected file to " target-dir ":")
+                    (concat "Copy selected file to " target-dir ":")
                     file-list-sorted
                     :re-builder #'ivy--regex
                     :sort nil
                     :initial-input nil))
 
-  ;; add full path to start file and end-file
-  (setq start-file-full
-        (expand-file-name start-file my-image-dir))
-  ;; generate target file name from current org section
-  (setq file-ext (file-name-extension start-file t))
+  (setq start-file-full (expand-file-name start-file my-image-dir))
 
-  ;; my phone app doesn't add an extension to the image so I do it
-  ;; here. If you want to keep the existing extension then use the
-  ;; line above
-  ;;(setq file-ext ".jpg")
-  ;; get section heading and clean it up
-  (setq end-file-base (s-downcase (s-dashed-words (nth 4 (org-heading-components)))))
-  ;; shorten to first 40 chars to avoid long file names
-  (setq end-file-base (s-left 40 end-file-base))
-  ;; number to append to ensure unique name
-  (setq file-number 1)
-  (setq end-file (concat
-                  end-file-base
-                  (format "-%s" file-number)
-                  file-ext))
-
-  ;; increment number at end of name if file exists
-  (while (file-exists-p end-file)
-    ;; increment
-    (setq file-number (+ file-number 1))
-    (setq end-file (concat
-                    end-file-base
-                    (format "-%s" file-number)
-                    file-ext))
-    )
-
-  ;; final file name including path
   (setq end-file-full
-        (expand-file-name end-file target-dir))
-  ;; rename file
-  (rename-file start-file-full end-file-full)
-  (message "moved %s to %s" start-file-full end-file)
-  ;; insert link
-  (insert (org-make-link-string (format "file:%s" end-file)))
-  ;; display image
+        (concat
+         (make-temp-name
+          (concat (file-name-nondirectory (buffer-file-name))
+                  "_imgs/"
+                  (file-name-sans-extension start-file)
+                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
+  (unless (file-exists-p (file-name-directory end-file-full))
+    (make-directory (file-name-directory end-file-full)))
+
+  (copy-file start-file-full end-file-full)
+  (message "Copied %s to %s" start-file-full end-file-full)
+
+  (if (file-exists-p end-file-full)
+      (insert (concat "[[file:" end-file-full "]]")))
+
   (org-display-inline-images t t)))
 
 (defun org-my-screenshot ()
   "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
   (interactive)
-  (org-display-inline-images)
   (setq filename
         (concat
          (make-temp-name
@@ -434,7 +413,9 @@
       (call-process "import" nil nil nil filename))
   ; insert into file if correctly taken
   (if (file-exists-p filename)
-    (insert (concat "[[file:" filename "]]"))))
+      (insert (concat "[[file:" filename "]]")))
+
+  (org-display-inline-images t t))
 
 (defun rename-file-and-buffer ()
   "Renames current buffer and file it is visiting."
