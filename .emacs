@@ -348,16 +348,24 @@
 
 ;; Custom functions
 
-(defvar my-image-dir (expand-file-name "/Users/max/Documents/org/sync-images"))
-
 (defun org-insert-my-image()
   "Copy image from a directory, insert to same directory as screenshots, add link in current file."
   (interactive)
 
-  (let (file-list target-dir file-list-sorted start-file start-file-full file-ext end-file end-file-base end-file-full file-number)
+  (let (prog-dir file-list target-dir file-list-sorted start-file start-file-full file-ext end-file end-file-base end-file-full file-number)
+    ;; The location of my sync program
+    (setq prog-dir "/Users/max/Documents/playground/golang/google-drive-sync-latest")
+    ;; Where to store the images, so that org-mode can pick them up
+    (setq target-dir "/Users/max/Documents/org/sync-images")
+
+    (let ((default-directory prog-dir)
+          (cmd (concat "go run main.go 77_ORG_IMAGES " target-dir " ./credentials.json")))
+      (message cmd)
+      (message (shell-command-to-string cmd)))
+
     (setq file-list
           (-remove (lambda (x) (nth 1 x))
-                   (directory-files-and-attributes my-image-dir)))
+                   (directory-files-and-attributes target-dir)))
 
     (setq target-dir (file-name-directory (buffer-file-name)))
 
@@ -375,7 +383,7 @@
                     :sort nil
                     :initial-input nil))
 
-  (setq start-file-full (expand-file-name start-file my-image-dir))
+  (setq start-file-full (expand-file-name start-file target-dir))
 
   (setq end-file-full
         (concat
