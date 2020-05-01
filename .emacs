@@ -276,13 +276,12 @@
 
 (use-package org
   :ensure t
+  :after (yasnippet)
   :init
+  (yas-minor-mode 1)
+
   (global-set-key (kbd "C-c q") 'org-agenda)
-  ;; (setq org-hide-emphasis-markers t)
-  ;; (setq org-emphasis-alist
-  ;;       (quote (("*" bold)
-  ;;               ("=" (:foreground "yellow" :background "black"))
-  ;;               )))
+
   (setq org-log-done t
         org-agenda-files '("/Users/max/Documents/org")))
 
@@ -308,6 +307,9 @@
   (add-hook 'c-mode-hook 'google-set-c-style)
   (add-hook 'c++-mode-hook 'google-set-c-style)
   :after (google-c-style))
+
+(use-package yasnippet
+  :ensure t)
 
 (use-package racket-mode
   :ensure t
@@ -506,7 +508,7 @@
                  ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(package-selected-packages
    (quote
-    (org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window))))
+    (yasnippet org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
