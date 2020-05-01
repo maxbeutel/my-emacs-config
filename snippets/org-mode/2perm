@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: 2perm
+# key: 2perm
+# --
+(${1:a} \, ${2:b})$0

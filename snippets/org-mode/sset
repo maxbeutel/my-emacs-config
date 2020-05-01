@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sset
+# key: sset
+# --
+${1:S} = \\\{ ${2:a} \\\}$0

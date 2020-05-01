@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: begina
+# key: begina
+# --
+\begin{align*}
+$0
+\end{align*}

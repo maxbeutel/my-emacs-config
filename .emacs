@@ -309,7 +309,10 @@
   :after (google-c-style))
 
 (use-package yasnippet
-  :ensure t)
+  :ensure t
+  :init
+  (setq yas-snippet-dirs (append yas-snippet-dirs
+                                 '("/Users/max/Documents/playground/emacs/my-emacs-config/snippets"))))
 
 (use-package racket-mode
   :ensure t
@@ -504,7 +507,7 @@
  ;; If there is more than one, they won't work right.
  '(org-format-latex-options
    (quote
-    (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :matchers
+    (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :mpatchers
                  ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(package-selected-packages
    (quote
