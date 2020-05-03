@@ -353,11 +353,77 @@
 
 ;; Custom functions
 
-(defun org-insert-my-image()
+(defun mb/org-new-snippet()
+  "Copy a snippet I saved from the sync folder to some other folder, so that I can add notes for it."
+  (interactive)
+  (let (prog-dir file-list target-dir snippets-dir sync-dir file-list-sorted start-file start-file-full end-file-full end-file-full-org)
+    ;; The location of my sync program
+    (setq prog-dir "/Users/max/Documents/playground/golang/google-drive-sync-latest")
+    ;; Where to store the images, so that org-mode can pick them up
+    (setq sync-dir "/Users/max/Documents/org/sync-snippets")
+
+    (setq snippets-dir "/Users/max/Documents/org/Snippets")
+
+    (let ((default-directory prog-dir)
+          (cmd (concat "go run main.go 66_ORG_SNIPPETS " sync-dir " ./credentials.json")))
+      (message cmd)
+      (message (shell-command-to-string cmd)))
+
+    (setq file-list
+          (-remove (lambda (x) (nth 1 x))
+                   (directory-files-and-attributes sync-dir)))
+
+  ;; Sort list by most recent
+  ;; http://stackoverflow.com/questions/26514437/emacs-sort-list-of-directories-files-by-modification-date
+  (setq file-list-sorted
+        (mapcar #'car
+                (sort file-list
+                      #'(lambda (x y) (time-less-p (nth 6 y) (nth 6 x))))))
+
+  (setq start-file (ivy-read
+                    (concat "Select file:")
+                    file-list-sorted
+                    :re-builder #'ivy--regex
+                    :sort nil
+                    :initial-input nil))
+
+  (message "start file is %s" start-file)
+
+  (setq start-file-full (expand-file-name start-file sync-dir))
+  (message "Start file full: %s" start-file-full)
+
+  (setq end-file-full (concat (file-name-as-directory snippets-dir) (file-name-nondirectory start-file-full)))
+  (message "End file full: %s" end-file-full)
+
+  (setq end-file-full-org (concat end-file-full ".org"))
+  (message "Corresponding .org file: %s" end-file-full-org)
+
+  (unless (file-exists-p snippets-dir)
+    (make-directory snippets-dir))
+
+  (unless (file-exists-p end-file-full-org)
+    (copy-file start-file-full end-file-full))
+
+  (message "Copied %s to %s" start-file-full end-file-full)
+
+  (unless (file-exists-p end-file-full-org)
+    (write-region "" nil end-file-full-org))
+
+  (message "Done with copying around.")
+
+  ;; Open the corresponding .org file
+  (find-file end-file-full-org)
+
+  ;; Open the downloaded snippet file (most likely a PDF)
+  (find-file end-file-full)
+  ;;(shell-command (concat "open " end-file-full))
+))
+
+(defun mb/org-insert-image()
   "Copy image from a directory, insert to same directory as screenshots, add link in current file."
   (interactive)
 
-  (let (prog-dir file-list target-dir sync-dir file-list-sorted start-file start-file-full file-ext end-file end-file-base end-file-full file-number)
+  (let (prog-dir file-list target-dir sync-dir file-list-sorted start-file start-file-full end-file-full)
     ;; The location of my sync program
     (setq prog-dir "/Users/max/Documents/playground/golang/google-drive-sync-latest")
     ;; Where to store the images, so that org-mode can pick them up
@@ -413,7 +479,7 @@
 
   (org-display-inline-images t t)))
 
-(defun org-my-screenshot ()
+(defun mb/org-screenshot ()
   "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
   (interactive)
   (setq filename
@@ -424,18 +490,20 @@
                   (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
   (unless (file-exists-p (file-name-directory filename))
     (make-directory (file-name-directory filename)))
+
   ; take screenshot
   (if (eq system-type 'darwin)
       (call-process "screencapture" nil nil nil "-i" filename))
   (if (eq system-type 'gnu/linux)
       (call-process "import" nil nil nil filename))
+
   ; insert into file if correctly taken
   (if (file-exists-p filename)
       (insert (concat "[[file:" filename "]]")))
 
   (org-display-inline-images t t))
 
-(defun rename-file-and-buffer ()
+(defun mb/rename-file-and-buffer ()
   "Renames current buffer and file it is visiting."
   (interactive)
   (let* ((name (buffer-name))
@@ -459,7 +527,7 @@
                    (recentf-remove-if-non-kept filename))
                (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
 
-(defun uniquify-all-lines-region (start end)
+(defun mb/uniquify-all-lines-region (start end)
   "Find duplicate lines in region START to END keeping first occurrence."
   (interactive "*r")
   (save-excursion
@@ -470,16 +538,14 @@
             (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
         (replace-match "\\1\n\\2")))))
 
-(defun copy-full-path-to-kill-ring ()
+(defun mb/copy-full-path-to-kill-ring ()
   "Copy buffer's full path to kill ring."
   (interactive)
   (when buffer-file-name
     (kill-new (file-truename buffer-file-name))))
 
 ;; General keybindings
-(global-set-key (kbd "C-c r") 'rename-file-and-buffer)
-
-(global-set-key (kbd "C-c t") 'toggle-window-split)
+(global-set-key (kbd "C-c r") 'mb/rename-file-and-buffer)
 
 (global-set-key (kbd "C-c c") 'comment-or-uncomment-region)
 
@@ -496,22 +562,26 @@
 
 (global-set-key (kbd "C-c x") 'erase-buffer)
 
-(global-set-key (kbd "M-k") 'delete-region)
-
-;; NOTE: customizing the scale factor of the Latex preview for org mode in `org-format-latex-options`.
+;; NOTE:
+;; - Below I'm customizing the scale factor of the Latex preview for org mode in `org-format-latex-options`.
+;; - Also customizing doc-view path to ghostscript, which was not found although it was in the PATH.
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(doc-view-ghostscript-program "/usr/local/bin/gs")
  '(org-format-latex-options
    (quote
     (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :mpatchers
                  ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(package-selected-packages
    (quote
-    (yasnippet org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window))))
+    (yasnippet org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window)))
+ '(yas-snippet-dirs
+   (quote
+    ("/Users/max/Documents/playground/emacs/my-emacs-config/snippets"))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -519,9 +589,9 @@
  ;; If there is more than one, they won't work right.
  '(cursor ((t (:background "#FF6F65"))))
  '(org-done ((t (:bold t :foreground "green"))))
- '(org-level-1 ((t (:bold nil :foreground "light gray" :height 1.0))))
+ '(org-level-1 ((t (:bold t :foreground "light gray" :height 1.0))))
  '(org-level-2 ((t (:bold nil :foreground "light gray" :height 1.0))))
- '(org-level-3 ((t (:bold nil :foreground "light gray" :height 1.0))))
+ '(org-level-3 ((t (:bold t :foreground "light gray" :height 1.0))))
  '(org-level-4 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-link ((t (:foreground "light slate gray" :underline t))))
  '(org-todo ((t (:bold t :foreground "red")))))
