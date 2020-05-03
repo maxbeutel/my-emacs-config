@@ -519,9 +519,9 @@
  ;; If there is more than one, they won't work right.
  '(cursor ((t (:background "#FF6F65"))))
  '(org-done ((t (:bold t :foreground "green"))))
- '(org-level-1 ((t (:bold t :foreground "light gray" :height 1.0))))
+ '(org-level-1 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-level-2 ((t (:bold nil :foreground "light gray" :height 1.0))))
- '(org-level-3 ((t (:bold t :foreground "light gray" :height 1.0))))
+ '(org-level-3 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-level-4 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-link ((t (:foreground "light slate gray" :underline t))))
  '(org-todo ((t (:bold t :foreground "red")))))
