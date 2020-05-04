@@ -278,6 +278,8 @@
   :ensure t
   :after (yasnippet)
   :init
+  (visual-line-mode 1)
+
   (yas-minor-mode 1)
 
   (global-set-key (kbd "C-c q") 'org-agenda)
@@ -310,7 +312,7 @@
 
 (use-package yasnippet
   :ensure t
-  :init
+  :config
   (setq yas-snippet-dirs (append yas-snippet-dirs
                                  '("/Users/max/Documents/playground/emacs/my-emacs-config/snippets"))))
 
@@ -588,10 +590,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(cursor ((t (:background "#FF6F65"))))
- '(org-done ((t (:bold t :foreground "green"))))
- '(org-level-1 ((t (:bold t :foreground "light gray" :height 1.0))))
+ '(org-done ((t (:bold nil :foreground "green"))))
+ '(org-level-1 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-level-2 ((t (:bold nil :foreground "light gray" :height 1.0))))
- '(org-level-3 ((t (:bold t :foreground "light gray" :height 1.0))))
+ '(org-level-3 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-level-4 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-link ((t (:foreground "light slate gray" :underline t))))
  '(org-todo ((t (:bold t :foreground "red")))))
