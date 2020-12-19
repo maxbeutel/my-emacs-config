@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: _homoker
+# key: _homoker
+# --
+\$\operatorname{Ker}(\phi)

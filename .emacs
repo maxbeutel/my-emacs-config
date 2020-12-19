@@ -37,9 +37,6 @@
 (recentf-mode 1)
 (setq recentf-max-menu-items 35)
 
-; show paren
-(show-paren-mode 1)
-
 ; make cursor blink forever
 (setq blink-cursor-blinks 0)
 
@@ -108,6 +105,8 @@
 
 ; Highlight matching parenthesis
 (show-paren-mode 1)
+(setq show-paren-priority -50)
+(setq hl-line-overlay-priority -100)
 
 ; Allows moving through wrapped lines as they appear
 (setq line-move-visual t)
@@ -253,6 +252,7 @@
   :init
   (add-hook 'dired-mode-hook 'auto-revert-mode)
   (setq-default dired-omit-files-p t)
+  (setq dired-omit-verbose 0)
   (setq dired-omit-files "\\~$"))
 
 (use-package crontab-mode
@@ -277,10 +277,15 @@
 (use-package org
   :ensure t
   :after (yasnippet)
-  :init
+  :config
+
   (visual-line-mode 1)
 
   (yas-minor-mode 1)
+
+  :init
+
+  (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
 
   (global-set-key (kbd "C-c q") 'org-agenda)
 
@@ -337,6 +342,7 @@
         		  `(org-level-2 ((t (:bold nil :foreground ,"light gray" :height 1.0))))
         		  `(org-level-3 ((t (:bold t :foreground ,"light gray" :height 1.0))))
         		  `(org-level-4 ((t (:bold nil :foreground ,"light gray" :height 1.0))))
+        		  `(org-level-5 ((t (:bold nil :foreground ,"light gray" :height 1.0))))
         		  `(org-link ((t (:foreground ,"light slate gray" :underline t))))
         		  `(org-todo ((t (:bold t :foreground "red"))))
         		  `(org-done ((t (:bold t :foreground "green")))))
@@ -345,10 +351,13 @@
   (custom-set-faces '(cursor ((t (:background "#FF6F65")))))
 
   ; Highlighting of current line background color, don't disable syntax coloring.
-  (global-hl-line-mode 1)
-  (set-face-attribute 'hl-line nil :inherit nil  :background "#222")
+  (global-hl-line-mode 0)
+  ; (set-face-attribute 'hl-line nil :inherit nil  :background "#222")
   (set-face-attribute 'highlight nil :inherit nil :foreground "#000" :background "lime")
   (set-face-attribute 'region nil :inherit nil :foreground "#000" :background "lime")
+  (set-face-attribute 'lazy-highlight nil :foreground "#000" :background "lime")
+  (set-face-attribute 'isearch nil :foreground "#000" :background "lime")
+  (set-face-attribute 'isearch-fail nil :foreground "#FFF" :background "red")
 
   ; Disable italics font face
   (set-face-italic 'font-lock-comment-face nil))
@@ -595,5 +604,6 @@
  '(org-level-2 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-level-3 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-level-4 ((t (:bold nil :foreground "light gray" :height 1.0))))
+ '(org-level-5 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-link ((t (:foreground "light slate gray" :underline t))))
  '(org-todo ((t (:bold t :foreground "red")))))

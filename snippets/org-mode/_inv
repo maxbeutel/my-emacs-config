@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: _inv
+# key: _inv
+# --
+\$${1:a}^{-${2:b}}$0

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: homoim
+# key: homoim
+# --
+\operatorname{Im}(\phi)

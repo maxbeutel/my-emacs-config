@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: _homom
+# key: _homom
+# --
+\$\phi : (${1:domain}) &\longrightarrow (${2:codomain}) \\\\
+${3:from} &\longrightarrow ${4:to}
