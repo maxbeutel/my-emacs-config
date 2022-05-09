@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: _ndots
+# key: _ndots
+# --
+\\(n = 1, 2, ... \\)

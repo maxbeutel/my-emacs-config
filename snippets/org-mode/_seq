@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: _seq
+# key: _seq
+# --
+\$(${1:a}_n)

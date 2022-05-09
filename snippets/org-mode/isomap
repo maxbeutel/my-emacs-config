@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: isomap
+# key: isomap
+# --
+${1:\phi} : ${2:G} &\rightarrow ${3:H} \\\\
+       e &\mapsto 0 \\\\
+       1 &\mapsto a

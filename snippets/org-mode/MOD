@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: MOD
+# key: MOD
+# --
+${1:a} \equiv ${2:b} \mod ${3:n}

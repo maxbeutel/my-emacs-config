@@ -289,6 +289,19 @@
 
   (global-set-key (kbd "C-c q") 'org-agenda)
 
+  (setq org-todo-keyword-faces
+        '(
+          ("TODO" . (:foreground "Red" :weight bold))
+          ("ONGOING" . (:foreground "Yellow" :weight bold))
+          ("REFERENCE" . (:foreground "DarkOrchid" :weight bold))
+          ("DOCUMENTED" . (:foreground "SpringGreen" :weight bold))
+          ("STOPPED" . (:foreground "MistyRose" :weight bold))
+          ("DONE" . (:foreground "Green" :weight bold))
+          ))
+
+  (setq org-todo-keywords
+        '((sequence "ONGOING" "TODO" "REFERENCE" "DOCUMENTED" "STOPPED" "DONE")))
+
   (setq org-log-done t
         org-agenda-files '("/Users/max/Documents/org")))
 
@@ -589,7 +602,7 @@
                  ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(package-selected-packages
    (quote
-    (yasnippet org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window)))
+    (tuareg multiple-cursors yasnippet org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window)))
  '(yas-snippet-dirs
    (quote
     ("/Users/max/Documents/playground/emacs/my-emacs-config/snippets"))))
@@ -599,10 +612,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(cursor ((t (:background "#FF6F65"))))
- '(org-done ((t (:bold nil :foreground "green"))))
- '(org-level-1 ((t (:bold nil :foreground "light gray" :height 1.0))))
+ '(org-done ((t (:bold t :foreground "green"))))
+ '(org-level-1 ((t (:bold t :foreground "light gray" :height 1.0))))
  '(org-level-2 ((t (:bold nil :foreground "light gray" :height 1.0))))
- '(org-level-3 ((t (:bold nil :foreground "light gray" :height 1.0))))
+ '(org-level-3 ((t (:bold t :foreground "light gray" :height 1.0))))
  '(org-level-4 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-level-5 ((t (:bold nil :foreground "light gray" :height 1.0))))
  '(org-link ((t (:foreground "light slate gray" :underline t))))

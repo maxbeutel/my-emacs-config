@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: ndots
+# key: ndots
+# --
+n = 1, 2, ...

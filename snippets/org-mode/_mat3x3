@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: _mat3x3
+# key: _mat3x3
+# --
+\$\begin{bmatrix}
+${1:a} & ${2:b} & ${3:c} \\\\
+${3:d} & ${5:e} & ${6:f} \\\\
+${7:g} & ${8:h} & ${9:i}
+\end{bmatrix}

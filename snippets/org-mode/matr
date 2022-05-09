@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
-# name: matr
-# key: matr
+# name: mat2x2
+# key: mat2x2
 # --
 \begin{bmatrix}
 ${1:a} & ${2:b} \\\\
