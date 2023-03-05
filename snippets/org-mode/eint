@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: eint
+# key: eint
+# --
+${3:x} \\Big|_${1:0}^${2:1}
