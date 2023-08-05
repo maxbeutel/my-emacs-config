@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: _orb
+# key: _orb
+# --
+\$\mathrm{Orb}(${1:x})

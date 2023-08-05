@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: _var
+# key: _var
+# --
+\$\\operatorname{Var}( ${1:X} )

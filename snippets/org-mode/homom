@@ -2,5 +2,5 @@
 # name: homom
 # key: homom
 # --
-\phi : (${1:domain}) &\longrightarrow (${2:codomain}) \\\\
-${3:from} &\longrightarrow ${4:to}
+\phi : ${1:domain} &\longrightarrow ${2:codomain} \\\\
+${3:from} &\mapsto ${4:to}

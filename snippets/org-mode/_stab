@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: _stab
+# key: _stab
+# --
+\$\mathrm{Stab}(${1:x})

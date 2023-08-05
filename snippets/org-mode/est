@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: est
+# key: est
+# --
+\widehat{${1:x}}

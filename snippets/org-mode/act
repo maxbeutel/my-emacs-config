@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: act
+# key: act
+# --
+${1:g} \wedge ${1:x}

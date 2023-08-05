@@ -1,5 +1,5 @@
 # -*- mode: snippet -*-
-# name: orgnewp
-# key: orgnewp
+# name: newp
+# key: newp
 # --
 #+LATEX: \newpage

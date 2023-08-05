@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: lcm
+# key: lcm
+# --
+\mathrm{lcm}(${1:m},${2:n})

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: cygr
+# key: cygr
+# --
+\\langle ${1:a} \\rangle
