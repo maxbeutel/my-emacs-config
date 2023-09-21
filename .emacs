@@ -287,7 +287,26 @@
 
   (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
 
-  (global-set-key (kbd "C-c q") 'org-agenda)
+  ;; Don't ask for confirmation when evaluating code blocks
+  (setq org-confirm-babel-evaluate nil)
+
+  (define-key org-mode-map (kbd "C-c C-x C-e") 'org-babel-execute-src-block)
+
+  ;; Override latex header to set document class to 'standalone'
+  ;; This allows rendering PDFs that have the same size as the tikz chart.
+  ;; Useful for embedding latex/tikz images in org documents.
+  (setq org-format-latex-header
+   "\\documentclass[tikz, border=1mm]{standalone}
+\\usepackage[usenames]{color}
+[PACKAGES]
+[DEFAULT-PACKAGES]
+\\pagestyle{empty}             % do not remove")
+
+  ;; Not exactly sure what this is, maybe HTML options for org mode export?
+  (setq org-format-latex-options
+   (quote
+    (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :mpatchers
+                 ("begin" "$1" "$" "$$" "\\(" "\\["))))
 
   (setq org-todo-keyword-faces
         '(
@@ -596,10 +615,6 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(doc-view-ghostscript-program "/usr/local/bin/gs")
- '(org-format-latex-options
-   (quote
-    (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :mpatchers
-                 ("begin" "$1" "$" "$$" "\\(" "\\["))))
  '(package-selected-packages
    (quote
     (tuareg multiple-cursors yasnippet org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window)))
