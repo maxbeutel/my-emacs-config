@@ -279,8 +279,11 @@
 ;; lots of whitespace ... but since there seems to be no way to fix this in a clean way at least in this outdated
 ;; version of org that I'm using right now, I decided to ignore it for the time being. ( Oct. 2023 )
 ;;
-;; --> Previous comment
-
+;; Ideally we could:
+;; - Preview any tikz inline in the org file in emacs, should probably work with SVGs, see https://gist.github.com/RyanGreenup/79a8eb780ff958267730c7e5845f1045 ?
+;; - Include a full-size version of tikz graph when generated as PDF/SVG.
+;;
+;; --> Previous comment, for historical context:
 ;; Override two functions for LaTex to provide different latex headers.
 ;; The only actual difference is, for the latex preview to work, we need documentclass{article}
 ;; But to render latex code, we need documentclass{standalone}
