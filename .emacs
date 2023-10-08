@@ -274,6 +274,53 @@
   (ido-mode 1)
   (ido-everywhere 1))
 
+;; In the end decided to not override these functions, instead mostly include PDF versions of the tikz graphs.
+;; It's stil problematic that tikz graphs use the same LaTeX document layout as regular org docs, which includes
+;; lots of whitespace ... but since there seems to be no way to fix this in a clean way at least in this outdated
+;; version of org that I'm using right now, I decided to ignore it for the time being. ( Oct. 2023 )
+;;
+;; --> Previous comment
+
+;; Override two functions for LaTex to provide different latex headers.
+;; The only actual difference is, for the latex preview to work, we need documentclass{article}
+;; But to render latex code, we need documentclass{standalone}
+;;
+;;
+;; (defun mb/latex-preview ()
+;;  (interactive)
+;;  (message "Latex preview")
+;;  (setq org-format-latex-header
+;;    "\\documentclass{article}
+;; \\usepackage[usenames]{color}
+;; [PACKAGES]
+;; [DEFAULT-PACKAGES]
+;; \\pagestyle{empty}             % do not remove
+;; % The settings below are copied from fullpage.sty
+;; \\setlength{\\textwidth}{\\paperwidth}
+;; \\addtolength{\\textwidth}{-3cm}
+;; \\setlength{\\oddsidemargin}{1.5cm}
+;; \\addtolength{\\oddsidemargin}{-2.54cm}
+;; \\setlength{\\evensidemargin}{\\oddsidemargin}
+;; \\setlength{\\textheight}{\\paperheight}
+;; \\addtolength{\\textheight}{-\\headheight}
+;; \\addtolength{\\textheight}{-\\headsep}
+;; \\addtolength{\\textheight}{-\\footskip}
+;; \\addtolength{\\textheight}{-3cm}
+;; \\setlength{\\topmargin}{1.5cm}
+;; \\addtolength{\\topmargin}{-2.54cm}")
+;;  (org-preview-latex-fragment))
+
+;; (defun mb/latex-eval ()
+;;  (interactive)
+;;  (message "Latex eval")
+;;  (setq org-format-latex-header
+;;    "\\documentclass[tikz, border=1mm]{standalone}
+;; \\usepackage[usenames]{color}
+;; [PACKAGES]
+;; [DEFAULT-PACKAGES]
+;; \\pagestyle{empty}             % do not remove")
+;;  (org-babel-execute-src-block))
+
 (use-package org
   :ensure t
   :after (yasnippet)
@@ -281,26 +328,20 @@
 
   (visual-line-mode 1)
 
-  (yas-minor-mode 1)
-
   :init
+
+  (yas-minor-mode 1)
 
   (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
 
   ;; Don't ask for confirmation when evaluating code blocks
   (setq org-confirm-babel-evaluate nil)
 
-  (define-key org-mode-map (kbd "C-c C-x C-e") 'org-babel-execute-src-block)
+  (setq org-image-actual-width nil)
 
-  ;; Override latex header to set document class to 'standalone'
-  ;; This allows rendering PDFs that have the same size as the tikz chart.
-  ;; Useful for embedding latex/tikz images in org documents.
-  (setq org-format-latex-header
-   "\\documentclass[tikz, border=1mm]{standalone}
-\\usepackage[usenames]{color}
-[PACKAGES]
-[DEFAULT-PACKAGES]
-\\pagestyle{empty}             % do not remove")
+  (define-key org-mode-map (kbd "C-c C-x C-l") 'org-preview-latex-fragment)
+  (define-key org-mode-map (kbd "C-c C-x C-p") 'org-latex-export-to-pdf)
+  (define-key org-mode-map (kbd "C-c C-x C-e") 'org-babel-execute-src-block)
 
   ;; Not exactly sure what this is, maybe HTML options for org mode export?
   (setq org-format-latex-options
@@ -395,133 +436,6 @@
   (set-face-italic 'font-lock-comment-face nil))
 
 ;; Custom functions
-
-(defun mb/org-new-snippet()
-  "Copy a snippet I saved from the sync folder to some other folder, so that I can add notes for it."
-  (interactive)
-  (let (prog-dir file-list target-dir snippets-dir sync-dir file-list-sorted start-file start-file-full end-file-full end-file-full-org)
-    ;; The location of my sync program
-    (setq prog-dir "/Users/max/Documents/playground/golang/google-drive-sync-latest")
-    ;; Where to store the images, so that org-mode can pick them up
-    (setq sync-dir "/Users/max/Documents/org/sync-snippets")
-
-    (setq snippets-dir "/Users/max/Documents/org/Snippets")
-
-    (let ((default-directory prog-dir)
-          (cmd (concat "go run main.go 66_ORG_SNIPPETS " sync-dir " ./credentials.json")))
-      (message cmd)
-      (message (shell-command-to-string cmd)))
-
-    (setq file-list
-          (-remove (lambda (x) (nth 1 x))
-                   (directory-files-and-attributes sync-dir)))
-
-  ;; Sort list by most recent
-  ;; http://stackoverflow.com/questions/26514437/emacs-sort-list-of-directories-files-by-modification-date
-  (setq file-list-sorted
-        (mapcar #'car
-                (sort file-list
-                      #'(lambda (x y) (time-less-p (nth 6 y) (nth 6 x))))))
-
-  (setq start-file (ivy-read
-                    (concat "Select file:")
-                    file-list-sorted
-                    :re-builder #'ivy--regex
-                    :sort nil
-                    :initial-input nil))
-
-  (message "start file is %s" start-file)
-
-  (setq start-file-full (expand-file-name start-file sync-dir))
-  (message "Start file full: %s" start-file-full)
-
-  (setq end-file-full (concat (file-name-as-directory snippets-dir) (file-name-nondirectory start-file-full)))
-  (message "End file full: %s" end-file-full)
-
-  (setq end-file-full-org (concat end-file-full ".org"))
-  (message "Corresponding .org file: %s" end-file-full-org)
-
-  (unless (file-exists-p snippets-dir)
-    (make-directory snippets-dir))
-
-  (unless (file-exists-p end-file-full-org)
-    (copy-file start-file-full end-file-full))
-
-  (message "Copied %s to %s" start-file-full end-file-full)
-
-  (unless (file-exists-p end-file-full-org)
-    (write-region "" nil end-file-full-org))
-
-  (message "Done with copying around.")
-
-  ;; Open the corresponding .org file
-  (find-file end-file-full-org)
-
-  ;; Open the downloaded snippet file (most likely a PDF)
-  (find-file end-file-full)
-  ;;(shell-command (concat "open " end-file-full))
-))
-
-(defun mb/org-insert-image()
-  "Copy image from a directory, insert to same directory as screenshots, add link in current file."
-  (interactive)
-
-  (let (prog-dir file-list target-dir sync-dir file-list-sorted start-file start-file-full end-file-full)
-    ;; The location of my sync program
-    (setq prog-dir "/Users/max/Documents/playground/golang/google-drive-sync-latest")
-    ;; Where to store the images, so that org-mode can pick them up
-    (setq sync-dir "/Users/max/Documents/org/sync-images")
-
-    (let ((default-directory prog-dir)
-          (cmd (concat "go run main.go 77_ORG_IMAGES " sync-dir " ./credentials.json")))
-      (message cmd)
-      (message (shell-command-to-string cmd)))
-
-    (setq file-list
-          (-remove (lambda (x) (nth 1 x))
-                   (directory-files-and-attributes sync-dir)))
-
-  ;; Sort list by most recent
-  ;; http://stackoverflow.com/questions/26514437/emacs-sort-list-of-directories-files-by-modification-date
-  (setq file-list-sorted
-        (mapcar #'car
-                (sort file-list
-                      #'(lambda (x y) (time-less-p (nth 6 y) (nth 6 x))))))
-
-  (setq start-file (ivy-read
-                    (concat "Select file:")
-                    file-list-sorted
-                    :re-builder #'ivy--regex
-                    :sort nil
-                    :initial-input nil))
-
-  (setq start-file-full (expand-file-name start-file sync-dir))
-
-  (message "Start file full")
-  (message start-file-full)
-
-  (setq end-file-full
-        (concat
-         (make-temp-name
-          (concat (file-name-nondirectory (buffer-file-name))
-                  "_imgs/"
-                  (file-name-sans-extension start-file)
-                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".jpg"))
-
-  (unless (file-exists-p (file-name-directory end-file-full))
-    (make-directory (file-name-directory end-file-full)))
-
-  (message "End file full")
-  (message end-file-full)
-
-  (copy-file start-file-full end-file-full)
-  (message "Copied %s to %s" start-file-full end-file-full)
-
-  (if (file-exists-p end-file-full)
-      (insert (concat "[[file:" end-file-full "]]")))
-
-  (org-display-inline-images t t)))
-
 (defun mb/org-screenshot ()
   "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
   (interactive)
@@ -570,16 +484,6 @@
                    (recentf-remove-if-non-kept filename))
                (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
 
-(defun mb/uniquify-all-lines-region (start end)
-  "Find duplicate lines in region START to END keeping first occurrence."
-  (interactive "*r")
-  (save-excursion
-    (let ((end (copy-marker end)))
-      (while
-          (progn
-            (goto-char start)
-            (re-search-forward "^\\(.*\\)\n\\(\\(.*\n\\)*\\)\\1\n" end t))
-        (replace-match "\\1\n\\2")))))
 
 (defun mb/copy-full-path-to-kill-ring ()
   "Copy buffer's full path to kill ring."
@@ -604,10 +508,6 @@
 (global-set-key (kbd "C-c j") 'recompile)
 
 (global-set-key (kbd "C-c x") 'erase-buffer)
-
-;; NOTE:
-;; - Below I'm customizing the scale factor of the Latex preview for org mode in `org-format-latex-options`.
-;; - Also customizing doc-view path to ghostscript, which was not found although it was in the PATH.
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
