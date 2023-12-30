@@ -1,28 +1,23 @@
 ;; package manager and include path
 
-;; Added by Package.el.  This must come before configurations of
-;; installed packages.  Don't delete this line.  If you don't want it,
-;; just comment it out by adding a semicolon to the start of the line.
-;; You may delete these explanatory comments.
+
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
 
-(setq package-archives '(("gnu" . "http://elpa.gnu.org/packages/")
-                         ("marmalade" . "https://marmalade-repo.org/packages/")
-                         ("org" . "http://orgmode.org/elpa/")
-                         ("melpa" . "http://melpa.org/packages/")))
-
 ;; include paths
-(setenv "PATH" (concat "/usr/local/bin:/opt:" (getenv "PATH")))
-(setq exec-path (append exec-path '("/Applications/Racket\ v7.6/bin/racket")))
-(setq exec-path (append exec-path '("/Users/max/go/bin")))
-(setq exec-path (append exec-path '("/usr/local/texlive/2017/bin/x86_64-darwin")))
+(setenv "PATH" (concat "/usr/local/bin:/opt:/Library/TeX/texbin:" (getenv "PATH")))
+(add-to-list 'exec-path "/Library/TeX/texbin")
 
 ;; extend load path
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/lisp"))
-(add-to-list 'load-path "/usr/local/Cellar/maxima/5.41.0/share/maxima/5.41.0/emacs")
 
-;; General ui
-(add-to-list 'default-frame-alist '(font . "Consolas-20"))
+;; General UI
+;;; TODO: Need to install Consolas again
+(set-frame-font "Menlo 20")
 
 ; enable all commands
 (setq disabled-command-function nil)
@@ -44,7 +39,7 @@
 (display-time-mode 1)
 
 ; show line numbers on the left hand side, show column in lower bar
-(global-linum-mode t)
+(global-display-line-numbers-mode 1)
 (setq column-number-mode t)
 
 ; re-builder
@@ -77,7 +72,7 @@
     (funcall mode -1)))
 
 ; enable auto-save of desktop
-(setq desktop-dirname "~/.emacs.d/"
+(setq desktop-dirname "~/"
       desktop-base-file-name "emacs.desktop"
       desktop-base-lock-name "lock"
       desktop-path (list desktop-dirname)
@@ -114,115 +109,12 @@
 ; Wrap long lines
 (setq-default truncate-lines nil)
 
-;; Packages
+; ######### Removed everything package related for now
 
-;; Syntax checking
-(use-package flycheck
-             :ensure t
-             :config
-             (global-flycheck-mode))
-
-;; Autocomplete popups
-(use-package company
-             :ensure t
-             :config
-             (progn
-               (setq company-idle-delay 0.2
-                     ;; min prefix of 2 chars
-                     company-minimum-prefix-length 2
-                     company-selection-wrap-around t
-                     company-show-numbers t
-                     company-echo-delay 0
-                     company-tooltip-limit 20
-                     company-transformers '(company-sort-by-occurrence)
-                     company-begin-commands '(self-insert-command)
-                     )
-               (global-company-mode))
-             )
-
-;; Make buffer names unique
-;; buffernames that are foo<1>, foo<2> are hard to read. This makes them foo|dir  foo|otherdir
-(use-package uniquify
-             :config (setq uniquify-buffer-name-style 'post-forward))
-
-(use-package diff-hl
-  :ensure t
-  :init
-  ; Show changes in fringe, use simple symbols
-  (global-diff-hl-mode 1)
-  (setq diff-hl-fringe-bmp-function 'diff-hl-fringe-bmp-from-type))
-
-(use-package neotree
-  :ensure t
-  :init
-  (global-set-key (kbd "C-c n") 'neotree-dir))
-
-(use-package expand-region
-  :ensure t
-  :init
-  (global-set-key (kbd "C-c l") 'er/expand-region))
-
-(use-package ace-window
-  :ensure t
-  :init
-  (global-set-key (kbd "C-x o") 'ace-window))
-
-(use-package avy
-  :ensure t
-  :init
-  (global-set-key (kbd "C-;") 'avy-goto-char)
-  (global-set-key (kbd "C-:") 'avy-goto-line))
-
-(use-package rainbow-delimiters
+(use-package rainbow-mode
   :ensure t
   :init
   (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
-
-(use-package hydra
-  :ensure t)
-
-(use-package ivy
-  :ensure t
-  :init
-  (ivy-mode 1)
-  (global-set-key (kbd "C-c C-r") 'ivy-resume)
-  (global-set-key (kbd "C-x b") 'ivy-switch-buffer)
-  (global-set-key (kbd "C-c v") 'ivy-push-view)
-  (global-set-key (kbd "C-c V") 'ivy-pop-view)
-  (setq ivy-use-virtual-buffers t)
-  (setq enable-recursive-minibuffers t))
-
-(use-package ivy-hydra
-  :ensure t
-  :after (ivy hydra))
-
-(use-package swiper
-  :ensure t
-  :after (ivy)
-  :init
-  ; (setq search-default-mode #'char-fold-to-regexp)
-  (global-set-key (kbd "C-c o") 'swiper))
-
-(use-package counsel
-  :ensure t
-  :after (ivy)
-  :init
-  (setq counsel-find-file-ignore-regexp "\\~$\\'")
-  (global-set-key (kbd "M-x") 'counsel-M-x)
-  (global-set-key (kbd "C-x C-f") 'counsel-find-file)
-  (global-set-key (kbd "M-y") 'counsel-yank-pop)
-  (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-  (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-  (global-set-key (kbd "<f1> l") 'counsel-find-library)
-  (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol)
-  (global-set-key (kbd "<f2> u") 'counsel-unicode-char)
-  (global-set-key (kbd "<f2> j") 'counsel-set-variable)
-  ;; (global-set-key (kbd "C-c g") 'counsel-git)
-  ;; (global-set-key (kbd "C-c j") 'counsel-git-grep)
-  ;; (global-set-key (kbd "C-c k") 'counsel-ag)
-  ;; (global-set-key (kbd "C-x l") 'counsel-locate)
-  ;; (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-  (define-key minibuffer-local-map (kbd "C-r") 'counsel-minibuffer-history))
 
 (use-package dockerfile-mode
   :ensure t)
@@ -230,182 +122,8 @@
 (use-package yaml-mode
   :ensure t)
 
-(use-package projectile
-  :ensure t
-  :config
-  (projectile-mode 1)
-  (setq projectile-use-git-grep 1))
-
-(use-package go-mode
-  :ensure t
-  :init
-  (setq gofmt-command "goimports")
-  (add-hook 'go-mode-hook
-	    (lambda () (add-hook 'before-save-hook #'gofmt-before-save))))
-
-(use-package dired+
-  :load-path "~/.emacs.d/packages/dired+"
-  :config
-  (diredp-toggle-find-file-reuse-dir 1))
-
-(use-package dired-x
-  :init
-  (add-hook 'dired-mode-hook 'auto-revert-mode)
-  (setq-default dired-omit-files-p t)
-  (setq dired-omit-verbose 0)
-  (setq dired-omit-files "\\~$"))
-
-(use-package crontab-mode
-  :ensure t
-  :init
-  (add-to-list 'auto-mode-alist '("crontab\\'" . crontab-mode))
-  (add-to-list 'auto-mode-alist '("/crontab_" . crontab-mode)))
-
-(use-package nxml-mode
-  :commands nxml-mode
-  :init
-  (setq nxml-child-indent 4
-	nxml-attribute-indent 4))
-
-;; TODO: do we need flx ido?
-(use-package ido-mode
-  :commands ido-mode
-  :init
-  (ido-mode 1)
-  (ido-everywhere 1))
-
-;; In the end decided to not override these functions, instead mostly include PDF versions of the tikz graphs.
-;; It's stil problematic that tikz graphs use the same LaTeX document layout as regular org docs, which includes
-;; lots of whitespace ... but since there seems to be no way to fix this in a clean way at least in this outdated
-;; version of org that I'm using right now, I decided to ignore it for the time being. ( Oct. 2023 )
-;;
-;; Ideally we could:
-;; - Preview any tikz inline in the org file in emacs, should probably work with SVGs, see https://gist.github.com/RyanGreenup/79a8eb780ff958267730c7e5845f1045 ?
-;; - Include a full-size version of tikz graph when generated as PDF/SVG.
-;;
-;; --> Previous comment, for historical context:
-;; Override two functions for LaTex to provide different latex headers.
-;; The only actual difference is, for the latex preview to work, we need documentclass{article}
-;; But to render latex code, we need documentclass{standalone}
-;;
-;;
-;; (defun mb/latex-preview ()
-;;  (interactive)
-;;  (message "Latex preview")
-;;  (setq org-format-latex-header
-;;    "\\documentclass{article}
-;; \\usepackage[usenames]{color}
-;; [PACKAGES]
-;; [DEFAULT-PACKAGES]
-;; \\pagestyle{empty}             % do not remove
-;; % The settings below are copied from fullpage.sty
-;; \\setlength{\\textwidth}{\\paperwidth}
-;; \\addtolength{\\textwidth}{-3cm}
-;; \\setlength{\\oddsidemargin}{1.5cm}
-;; \\addtolength{\\oddsidemargin}{-2.54cm}
-;; \\setlength{\\evensidemargin}{\\oddsidemargin}
-;; \\setlength{\\textheight}{\\paperheight}
-;; \\addtolength{\\textheight}{-\\headheight}
-;; \\addtolength{\\textheight}{-\\headsep}
-;; \\addtolength{\\textheight}{-\\footskip}
-;; \\addtolength{\\textheight}{-3cm}
-;; \\setlength{\\topmargin}{1.5cm}
-;; \\addtolength{\\topmargin}{-2.54cm}")
-;;  (org-preview-latex-fragment))
-
-;; (defun mb/latex-eval ()
-;;  (interactive)
-;;  (message "Latex eval")
-;;  (setq org-format-latex-header
-;;    "\\documentclass[tikz, border=1mm]{standalone}
-;; \\usepackage[usenames]{color}
-;; [PACKAGES]
-;; [DEFAULT-PACKAGES]
-;; \\pagestyle{empty}             % do not remove")
-;;  (org-babel-execute-src-block))
-
-(use-package org
-  :ensure t
-  :after (yasnippet)
-  :config
-
-  (visual-line-mode 1)
-
-  :init
-
-  (yas-minor-mode 1)
-
-  (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
-
-  ;; Don't ask for confirmation when evaluating code blocks
-  (setq org-confirm-babel-evaluate nil)
-
-  (setq org-image-actual-width nil)
-
-  (define-key org-mode-map (kbd "C-c C-x C-l") 'org-preview-latex-fragment)
-  (define-key org-mode-map (kbd "C-c C-x C-p") 'org-latex-export-to-pdf)
-  (define-key org-mode-map (kbd "C-c C-x C-e") 'org-babel-execute-src-block)
-
-  ;; Not exactly sure what this is, maybe HTML options for org mode export?
-  (setq org-format-latex-options
-   (quote
-    (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :mpatchers
-                 ("begin" "$1" "$" "$$" "\\(" "\\["))))
-
-  (setq org-todo-keyword-faces
-        '(
-          ("TODO" . (:foreground "Red" :weight bold))
-          ("ONGOING" . (:foreground "Yellow" :weight bold))
-          ("REFERENCE" . (:foreground "DarkOrchid" :weight bold))
-          ("DOCUMENTED" . (:foreground "SpringGreen" :weight bold))
-          ("STOPPED" . (:foreground "MistyRose" :weight bold))
-          ("DONE" . (:foreground "Green" :weight bold))
-          ))
-
-  (setq org-todo-keywords
-        '((sequence "ONGOING" "TODO" "REFERENCE" "DOCUMENTED" "STOPPED" "DONE")))
-
-  (setq org-log-done t
-        org-agenda-files '("/Users/max/Documents/org")))
-
-(use-package string-inflection
+(use-package python-mode
   :ensure t)
-
-(use-package org-bullets
-  :ensure t
-  :init
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-
-(use-package google-c-style
-  :ensure t)
-
-(use-package c-mode
-  :commands c-mode
-  :init
-  (add-hook 'c-mode-common-hook
-	    (lambda ()
-	      (c-set-offset 'case-label '+)
-	      (c-set-offset 'inclass '4)
-	      (c-set-offset 'comment-intro 0)))
-  (add-hook 'c-mode-hook 'google-set-c-style)
-  (add-hook 'c++-mode-hook 'google-set-c-style)
-  :after (google-c-style))
-
-(use-package yasnippet
-  :ensure t
-  :config
-  (setq yas-snippet-dirs (append yas-snippet-dirs
-                                 '("/Users/max/Documents/playground/emacs/my-emacs-config/snippets"))))
-
-(use-package racket-mode
-  :ensure t
-  :init
-  (setq racket-program "/Applications/Racket v7.6/bin/racket"))
-
-(use-package maxima
-  :init
-  (setq imaxima-use-maxima-mode-flag t)
-  (add-to-list 'auto-mode-alist '("\\.ma[cx]" . maxima-mode)))
 
 (use-package minimal-theme
   :ensure t
@@ -438,64 +156,151 @@
   ; Disable italics font face
   (set-face-italic 'font-lock-comment-face nil))
 
-;; Custom functions
-(defun mb/org-screenshot ()
-  "Take a screenshot into a time stamped unique-named file in the same directory as the org-buffer and insert a link to this file."
-  (interactive)
-  (setq filename
-        (concat
-         (make-temp-name
-          (concat (file-name-nondirectory (buffer-file-name))
-                  "_imgs/"
-                  (format-time-string "%Y%m%d_%H%M%S_")) ) ".png"))
-  (unless (file-exists-p (file-name-directory filename))
-    (make-directory (file-name-directory filename)))
+(use-package yasnippet
+  :ensure t
+  :config
+  (setq yas-snippet-dirs (append yas-snippet-dirs
+                                 '("/Users/max/Documents/my-emacs-config/snippets"))))
 
-  ; take screenshot
-  (if (eq system-type 'darwin)
-      (call-process "screencapture" nil nil nil "-i" filename))
-  (if (eq system-type 'gnu/linux)
-      (call-process "import" nil nil nil filename))
+(use-package expand-region
+  :ensure t
+  :init
+  (global-set-key (kbd "C-c l") 'er/expand-region))
 
-  ; insert into file if correctly taken
-  (if (file-exists-p filename)
-      (insert (concat "[[file:" filename "]]")))
+;; Autocomplete popups
+(use-package company
+             :ensure t
+             :config
+             (progn
+               (setq company-idle-delay 0.2
+                     ;; min prefix of 2 chars
+                     company-minimum-prefix-length 2
+                     company-selection-wrap-around t
+                     company-show-numbers t
+                     company-echo-delay 0
+                     company-tooltip-limit 20
+                     company-transformers '(company-sort-by-occurrence)
+                     company-begin-commands '(self-insert-command)
+                     )
+               (global-company-mode))
+             )
 
-  (org-display-inline-images t t))
+(use-package avy
+  :ensure t
+  :init
+  (global-set-key (kbd "C-;") 'avy-goto-char)
+  (global-set-key (kbd "C-:") 'avy-goto-line))
 
-(defun mb/rename-file-and-buffer ()
-  "Renames current buffer and file it is visiting."
-  (interactive)
-  (let* ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (if (not (and filename (file-exists-p filename)))
-        (error "Buffer '%s' is not visiting a file!" name)
-      (let* ((dir (file-name-directory filename))
-             (new-name (read-file-name "New name: " dir)))
-        (cond ((get-buffer new-name)
-               (error "A buffer named '%s' already exists!" new-name))
-              (t
-               (let ((dir (file-name-directory new-name)))
-                 (when (and (not (file-exists-p dir)) (yes-or-no-p (format "Create directory '%s'?" dir)))
-                   (make-directory dir t)))
-               (rename-file filename new-name 1)
-               (rename-buffer new-name)
-               (set-visited-file-name new-name)
-               (set-buffer-modified-p nil)
-               (when (fboundp 'recentf-add-file)
-                   (recentf-add-file new-name)
-                   (recentf-remove-if-non-kept filename))
-               (message "File '%s' successfully renamed to '%s'" name (file-name-nondirectory new-name))))))))
+;; For the LaTex integration:
+;;
+;; If packages are not found, install them with `sudo tlmgr install wrapfig.sty`
+;; Error messages look like:
+;;    File `wrapfig.sty' not found.
+;;
+;; This can happen since we installed only basictex via brew
+(use-package org
+  :ensure t
+  :after (yasnippet)
+  :config
+
+  (visual-line-mode 1)
+
+  :init
+
+  (yas-minor-mode 1)
+
+  (org-babel-do-load-languages 'org-babel-load-languages '((latex . t)))
+
+  ;; Don't ask for confirmation when evaluating code blocks
+  (setq org-confirm-babel-evaluate nil)
+
+  (setq org-image-actual-width nil)
+
+  (define-key org-mode-map (kbd "C-c C-x C-l") 'org-toggle-latex-fragment)
+  (define-key org-mode-map (kbd "C-c C-x C-p") 'org-latex-export-to-pdf)
+  (define-key org-mode-map (kbd "C-c C-x C-e") 'org-babel-execute-src-block)
+
+  ;; Not exactly sure what this is, maybe HTML options for org mode export?
+  (setq org-format-latex-options
+   (quote
+    (:foreground default :background default :scale 2.2 :html-foreground "Black" :html-background "Transparent" :html-scale 1.0 :mpatchers
+                 ("begin" "$1" "$" "$$" "\\(" "\\["))))
+
+  (setq org-todo-keyword-faces
+        '(
+          ("TODO" . (:foreground "Red" :weight bold))
+          ("ONGOING" . (:foreground "Yellow" :weight bold))
+          ("REFERENCE" . (:foreground "DarkOrchid" :weight bold))
+          ("DOCUMENTED" . (:foreground "SpringGreen" :weight bold))
+          ("STOPPED" . (:foreground "MistyRose" :weight bold))
+          ("DONE" . (:foreground "Green" :weight bold))
+          ))
+
+  (setq org-todo-keywords
+        '((sequence "ONGOING" "TODO" "REFERENCE" "DOCUMENTED" "STOPPED" "DONE")))
+
+)
+
+(use-package org-bullets
+  :ensure t
+  :init
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 
-(defun mb/copy-full-path-to-kill-ring ()
-  "Copy buffer's full path to kill ring."
-  (interactive)
-  (when buffer-file-name
-    (kill-new (file-truename buffer-file-name))))
+;; vertico
+(use-package vertico
+  :init
+  (vertico-mode)
+
+  ;; Different scroll margin
+  ;; (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+  )
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
 
 ;; General keybindings
-(global-set-key (kbd "C-c r") 'mb/rename-file-and-buffer)
+;;; Not used for now
+;;;(global-set-key (kbd "C-c r") 'mb/rename-file-and-buffer)
 
 (global-set-key (kbd "C-c c") 'comment-or-uncomment-region)
 
@@ -517,13 +322,8 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(doc-view-ghostscript-program "/usr/local/bin/gs")
  '(package-selected-packages
-   (quote
-    (tuareg multiple-cursors yasnippet org-bullets yaml-mode dockerfile-mode use-package tao-theme string-inflection rainbow-delimiters racket-mode projectile neotree monochrome-theme molokai-theme minimal-theme ivy-hydra google-c-style go-mode expand-region diff-hl crontab-mode counsel ace-window)))
- '(yas-snippet-dirs
-   (quote
-    ("/Users/max/Documents/playground/emacs/my-emacs-config/snippets"))))
+   '(rainbow-delimeters-mode yasnippet yaml-mode vertico rainbow-mode rainbow-delimiters python-mode org-bullets minimal-theme expand-region dockerfile-mode company avy)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
