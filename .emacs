@@ -157,10 +157,9 @@
   (set-face-italic 'font-lock-comment-face nil))
 
 (use-package yasnippet
-  :ensure t
   :config
-  (setq yas-snippet-dirs (append yas-snippet-dirs
-                                 '("/Users/max/Documents/my-emacs-config/snippets"))))
+  (add-to-list 'yas-snippet-dirs "/Users/max/Documents/my-emacs-config/snippets")
+  (yas-global-mode 1))
 
 (use-package expand-region
   :ensure t
